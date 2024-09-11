@@ -21,6 +21,7 @@ def isInt(char):
         return False
 def calculateScore(deck):
     score = 0
+    aCount = 0
     for card in deck:
         card = card[1:]
         
@@ -29,10 +30,10 @@ def calculateScore(deck):
         elif card != "A":
             score += 10
         else:
-            
-            score += 11
-            if score > 21:
-                score -= 10
+            aCount += 1
+    score += aCount
+    if score < 12 and aCount > 0:
+        score += 10
     return score
 def askPlayer():
     a = input("Would you like to draw or stand?")
