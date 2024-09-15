@@ -1,5 +1,7 @@
 import random
+import os
 
+# Master Deck definition
 MasterDeck = [
     ("Hearts", 1), ("Hearts", 2), ("Hearts", 3), ("Hearts", 4), ("Hearts", 5),
     ("Hearts", 6), ("Hearts", 7), ("Hearts", 8), ("Hearts", 9), ("Hearts", 10),
@@ -17,6 +19,18 @@ MasterDeck = [
 
 GameDeck = []
 
+# Unicode card symbols lookup
+card_symbols = {
+    "Hearts": {1: "🂱", 2: "🂲", 3: "🂳", 4: "🂴", 5: "🂵", 6: "🂶", 7: "🂷", 8: "🂸", 9: "🂹", 10: "🂺", 11: "🂻", 12: "🂽", 13: "🂾"},
+    "Spades": {1: "🂡", 2: "🂢", 3: "🂣", 4: "🂤", 5: "🂥", 6: "🂦", 7: "🂧", 8: "🂨", 9: "🂩", 10: "🂪", 11: "🂫", 12: "🂭", 13: "🂮"},
+    "Clubs": {1: "🃑", 2: "🃒", 3: "🃓", 4: "🃔", 5: "🃕", 6: "🃖", 7: "🃗", 8: "🃘", 9: "🃙", 10: "🃚", 11: "🃛", 12: "🃝", 13: "🃞"},
+    "Diamonds": {1: "🃁", 2: "🃂", 3: "🃃", 4: "🃄", 5: "🃅", 6: "🃆", 7: "🃇", 8: "🃈", 9: "🃉", 10: "🃊", 11: "🃋", 12: "🃍", 13: "🃎"}
+}
+
+def clear_console():
+    """Clear the console based on the operating system."""
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 def init():
     global GameDeck 
     temp = MasterDeck[:]  
@@ -31,9 +45,19 @@ def serve(num_cards=1):
     # Deal 'num_cards' cards to the player and the dealer alternately
     for _ in range(num_cards):
         if GameDeck:
-            player.append(GameDeck.pop(0))  # Deal a card to the player
+            card = GameDeck.pop(0)
+            if card[1] == 1:
+                card = handle_ace(card)
+            player.append(card)  # Deal a card to the player
         if GameDeck:
             Dealer.append(GameDeck.pop(0))  # Deal a card to the dealer
+
+def handle_ace(card):
+    """Ask the player if they want the Ace to count as 1 or 11."""
+    choice = input(f"You drew an Ace of {card[0]}. Would you like it to count as 1 or 11? ")
+    if choice == "11":
+        return (card[0], 11)
+    return card
 
 def card_value(card):
     """Calculate the value of a single card."""
@@ -44,30 +68,43 @@ def card_value(card):
 
 def hand_value(hand):
     """Calculate the total value of a hand."""
-    total = sum(card_value(card) for card in hand)
-    aces = sum(1 for card in hand if card[1] == 1)
-    
-    # Adjust for Aces value
-    while aces > 0 and total + 10 <= 21:
-        total += 10
-        aces -= 1
-    
-    return total
+    return sum(card_value(card) for card in hand)
 
 def bust(hand):
     """Check if a hand is bust (i.e., over 21)."""
     return hand_value(hand) > 21
 
+def get_card_symbol(card):
+    """Return the Unicode symbol for a given card."""
+    suit, value = card
+    return card_symbols[suit][value]
+
+def print_hand_status():
+    """Print the status of the player's hand with Unicode symbols and its value."""
+    hand_symbols = " ".join(get_card_symbol(card) for card in player)
+    print(f"Player's hand: {hand_symbols} Total: {hand_value(player)}")
+
+def print_dealer_hand(hidden=True):
+    """Print the dealer's hand, hiding the first card if needed."""
+    if hidden:
+        hand_symbols = f"🂠 {' '.join(get_card_symbol(card) for card in Dealer[1:])}"
+        print(f"Dealer's hand: {hand_symbols} Total: ??")
+    else:
+        hand_symbols = " ".join(get_card_symbol(card) for card in Dealer)
+        print(f"Dealer's hand: {hand_symbols} Total: {hand_value(Dealer)}")
+
 game = True
-player = []
-Dealer = []
 
 while game:
+    player = []
+    Dealer = []
     init()
+    clear_console()  # Clear the console before starting a new game
     print("Welcome to Blackjack")
+    
     serve(2)  # Deal 2 cards each to player and dealer
-    #print("Dealer's hand:", Dealer)
-    print("Player's hand:", player)
+    print_hand_status()
+    print_dealer_hand(hidden=True)  # Dealer's hand, hide first card
     
     # Check initial bust
     if bust(player):
@@ -80,9 +117,11 @@ while game:
     playing = True
     while playing:
         response = input("Would you like to draw or stand (y/n)? ").strip().lower()
+        clear_console()  # Clear the console before showing new information
         if response == "y":
             serve(1)
-            print("Player's hand:", player)
+            print_hand_status()
+            print_dealer_hand(hidden=True)
             if bust(player):
                 print("Player busts!")
                 playing = False
@@ -91,9 +130,19 @@ while game:
             playing = False
 
     if not bust(player):
+        # Dealer hits if hand value is less than 17
         while hand_value(Dealer) < 17:
-            serve(1)
-        print("Dealer's hand:", Dealer)
+            serve(1)  # Dealer draws until hand is 17 or higher
+            clear_console()
+            print("Dealer draws a card...")
+            print_hand_status()
+            print_dealer_hand(hidden=True)  # Still hide first card during dealer's draw
+        
+        # Dealer's final hand (reveal all cards)
+        clear_console()
+        print_hand_status()
+        print_dealer_hand(hidden=False)  # Reveal all dealer cards at the end
+
         if bust(Dealer):
             print("Dealer busts!")
         else:
@@ -106,5 +155,9 @@ while game:
             else:
                 print("It's a tie!")
 
-    game = False  # End the game loop after one iteration for demonstration
+    # Ask if the player wants to play again
+    replay = input("Would you like to play again (y/n)? ").strip().lower()
+    if replay != "y":
+        game = False  # End the game loop
 
+print("Thank you for playing!")
