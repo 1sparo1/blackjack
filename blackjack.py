@@ -155,9 +155,12 @@ while game:
             else:
                 print("It's a tie!")
 
-    # Ask if the player wants to play again
+        # Ask if the player wants to play again
     replay = input("Would you like to play again (y/n)? ").strip().lower()
-    if replay != "y":
-        game = False  # End the game loop
+    while replay not in ["y", "n"]:
+        replay = input("Invalid input. Please enter 'y' or 'n': ").strip().lower()
+    
+    if replay == "n":
+        game = False
 
 print("Thank you for playing!")
