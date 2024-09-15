@@ -11,32 +11,41 @@ for clas in classes:
     cards.append(clas + "J")
     cards.append(clas + "Q")
     cards.append(clas + "K")
+#shuffles cards
 random.shuffle(cards)
 print("Let's play blackjack!")
+
+#checks if character is integer
 def isInt(char):
     try: 
         int(char)
         return True
     except:
         return False
+#calculates scores
 def calculateScore(deck):
     score = 0
     aCount = 0
     for card in deck:
         card = card[1:]
-        
+        #if number card just add the number
         if isInt(card):
             score += int(card)
+        #if its not a number and not an ace add 10(King,Queen,Jack)
         elif card != "A":
             score += 10
+        #count Aces
         else:
             aCount += 1
+    #adds all aces as ones
     score += aCount
     if score < 12 and aCount > 0:
+        #if the score is 11 or under and you have aces you can add 10
         score += 10
     return score
+#asks the player if they wanna draw or stand until they put one or the other
 def askPlayer():
-    a = input("Would you like to draw or stand?")
+    a = input("Would you like to draw or stand? ")
     if a == "draw":
         return True
     elif a == "stand":
@@ -44,43 +53,54 @@ def askPlayer():
     else:
         print("Say either draw or stand.")
         return askPlayer()
-dealerDeck = []
-dealerDeck.append(cards.pop())
-dealerDeck.append(cards.pop())
-playerDeck = []
-playerDeck.append(cards.pop())
-playerDeck.append(cards.pop())
-while calculateScore(dealerDeck) < 17:
-    dealerDeck.append(cards.pop())
-if calculateScore(dealerDeck) > 21:
+#initializes hands of delear and player, giving each 2 cards
+dealerHand = []
+dealerHand.append(cards.pop())
+dealerHand.append(cards.pop())
+playerHand = []
+playerHand.append(cards.pop())
+playerHand.append(cards.pop())
+#dealer draws until score exceeds 17
+while calculateScore(dealerHand) < 17:
+    dealerHand.append(cards.pop())
+#if dealer busts player wins
+if calculateScore(dealerHand) > 21:
     print("Dealer busts, you win!")
     exit(3)
 def playBlackJack():
     
-    print("Here is your deck: " + str(playerDeck))
-    if calculateScore(playerDeck) > 21:
+    print("Here is your deck: " + str(playerHand))
+    #checks score to see if player busts or wins
+    if calculateScore(playerHand) > 21:
         print("You busted.")
-        exit(3)
-    if calculateScore(playerDeck) == 21:
-        if calculateScore(dealerDeck) == 21:
+        return
+    if calculateScore(playerHand) == 21:
+        if calculateScore(dealerHand) == 21:
             print("You tie.")
         else:
             print("You win!")
-        exit(3)
+        print("The dealer's deck is " + str(dealerHand))
+        return
+    #asks player whether they wanna stand or draw
     didDraw = askPlayer()
     if didDraw == True:
-        playerDeck.append(cards.pop())
-        print("You drew " + str(playerDeck[-1]))
+        #draws a card
+        playerHand.append(cards.pop())
+        print("You drew " + str(playerHand[-1]))
+        #recursive game loop
         playBlackJack()
     else:
-        if calculateScore(playerDeck) > calculateScore(dealerDeck):
+        if calculateScore(playerHand) > calculateScore(dealerHand):
+            #better score than dealer means you win
             print("You win!")
             
-        elif calculateScore(playerDeck) < calculateScore(dealerDeck):
+        elif calculateScore(playerHand) < calculateScore(dealerHand):
+            #Worse score means you lose
             print("You lose")
         else:
+            #same score means tie
             print("Tie")
-        print("The dealer's deck " + str(dealerDeck))
-        exit(3)
-#print(isInt("11"))
+        print("The dealer's deck is " + str(dealerHand))
+        return
+
 playBlackJack()
