@@ -1,6 +1,5 @@
 import random
 
-# Define the master deck with unique keys for suits and card values
 MasterDeck = [
     ("Hearts", 1), ("Hearts", 2), ("Hearts", 3), ("Hearts", 4), ("Hearts", 5),
     ("Hearts", 6), ("Hearts", 7), ("Hearts", 8), ("Hearts", 9), ("Hearts", 10),
@@ -19,10 +18,10 @@ MasterDeck = [
 GameDeck = []
 
 def init():
-    global GameDeck  # Use the global GameDeck variable
-    temp = MasterDeck[:]  # Create a copy of the MasterDeck
-    random.shuffle(temp)  # Shuffle the copy
-    GameDeck = temp  # Assign the shuffled deck to GameDeck
+    global GameDeck 
+    temp = MasterDeck[:]  
+    random.shuffle(temp)  
+    GameDeck = temp  
 
 def serve(num_cards=1):
     global GameDeck
