@@ -116,9 +116,9 @@ while game:
 
     playing = True
     while playing:
-        response = input("Would you like to draw or stand (y/n)? ").strip().lower()
-        clear_console()  # Clear the console before showing new information
-        if response == "y":
+        response = input("Would you like to draw(1) or stand(2)? ").strip().lower()
+        #clear_console()  # Clear the console before showing new information
+        if response == "1" or response == "draw":
             serve(1)
             print_hand_status()
             print_dealer_hand(hidden=True)
@@ -126,7 +126,7 @@ while game:
                 print("Player busts!")
                 playing = False
                 break
-        elif response == "n":
+        elif response == "2" or response == "stand":
             playing = False
 
     if not bust(player):
