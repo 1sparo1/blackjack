@@ -117,7 +117,6 @@ while game:
     playing = True
     while playing:
         response = input("Would you like to draw(1) or stand(2)? ").strip().lower()
-        #clear_console()  # Clear the console before showing new information
         if response == "1" or response == "draw":
             serve(1)
             print_hand_status()
@@ -132,7 +131,7 @@ while game:
     if not bust(player):
         # Dealer hits if hand value is less than 17
         while hand_value(Dealer) < 17:
-            serve(1)  # Dealer draws until hand is 17 or higher
+            Dealer.append(GameDeck.pop(0))  # Dealer draws until hand is 17 or higher
             clear_console()
             print("Dealer draws a card...")
             print_hand_status()
@@ -155,7 +154,7 @@ while game:
             else:
                 print("It's a tie!")
 
-        # Ask if the player wants to play again
+    # Ask if the player wants to play again
     replay = input("Would you like to play again (y/n)? ").strip().lower()
     while replay not in ["y", "n"]:
         replay = input("Invalid input. Please enter 'y' or 'n': ").strip().lower()
